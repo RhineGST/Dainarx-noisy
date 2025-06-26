@@ -30,8 +30,7 @@ def run(data_list, input_data, config, evaluation: Evaluation):
     chp_list = []
     for data, input_val in zip(data_list, input_data):
         change_points = find_change_point(data, input_val, get_feature, w=config['window_size'])
-        chp_list.append(change_points)
-        print("ChP:\t", change_points)
+        print("ChP:\t", np.array(change_points))
         slice_curve(slice_data, data, input_val, change_points, get_feature)
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
@@ -74,7 +73,7 @@ def get_config(json_path, evaluation: Evaluation):
     return config, get_hash_code(json_file, config)
 
 
-def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
+def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
     evaluation = Evaluation(json_path)
     config, hash_code = get_config(json_path, evaluation)
     HybridAutomata.LoopWarning = not config['self_loop']
@@ -126,7 +125,6 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     data_test = data[:test_num]
     mode_list_test = mode_list[:test_num]
     input_list_test = input_list[:test_num]
-
     init_state_test = get_init_state(data_test, mode_map, mode_list_test, config['order'])
     fit_data_list, mode_data_list = [], []
     draw_index = 0  # If it is None, draw all the test data
@@ -159,7 +157,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/non_linear/duffing.json")
+    eval_log = main("./automata/FaMoS/simple_heating_system.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

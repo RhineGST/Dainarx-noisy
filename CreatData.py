@@ -46,9 +46,14 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
                 now += dT
                 idx += 1
                 state, mode, switched = sys.next(dT)
-                state_data.append(state)
+                # 添加噪声
+                noisy_state = [state[0] + np.random.normal(0, 0.05)]
+                state_data.append(noisy_state)
                 mode_data.append(mode)
-                input_data.append(sys.getInput())
+                # 添加噪声
+                input_val = sys.getInput()
+                # noisy_input = [input_val[0]+ np.random.normal(0, 0.05)]
+                input_data.append(input_val)                                   
                 if switched:
                     change_points.append(idx)
             change_points.append(idx)
