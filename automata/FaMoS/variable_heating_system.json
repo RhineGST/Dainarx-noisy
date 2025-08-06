@@ -50,9 +50,12 @@
 ],
 
   "config": {
-    "dt": 0.01,
+    "dt": 0.05,
     "total_time": 20.0,
+    "sigma_measure": 0.05,
+    "sigma_process": 0.05,
     "order": 1,
-    "class_weight": 0.1
+    "class_weight": 0.1,
+    "window_size": 10
   }
 }

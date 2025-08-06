@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import os
 from math import *
@@ -31,6 +33,9 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
     with open(json_path, 'r') as f:
         data = json.load(f)
         sys = HybridAutomata.from_json(data['automaton'])
+        config = data.get('config', {})
+        sigma_measure = config.get('sigma_measure', 0.0)
+        sigma_process = config.get('sigma_process', 0.0)
         state_id = 0
         cnt = 0
         for init_state in data['init_state']:
@@ -45,8 +50,9 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
             while now < times:
                 now += dT
                 idx += 1
-                state, mode, switched = sys.next(dT)
-                state_data.append(state)
+                state, mode, switched = sys.next(dT, sigma_process)
+                state_data.append(np.array(state) +
+                                  np.array([random.normalvariate(0, sigma_measure) for _ in range(len(state))]))
                 mode_data.append(mode)
                 input_data.append(sys.getInput())
                 if switched:

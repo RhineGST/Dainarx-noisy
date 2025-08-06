@@ -58,3 +58,4 @@ def clustering(data: list[Slice], self_loop=False):
             s.mode = tot_mode
             mode_dict[tot_mode] = [s]
             tot_mode += 1
+    print(f"clustering number: {tot_mode - 1}")

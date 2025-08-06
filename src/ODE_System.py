@@ -91,13 +91,14 @@ class ODESystem:
             res[idx][self.order_list[idx] - 1] = self.eq_list[idx](y, *self.getInput(t))
         return res
 
-    def next(self, dT: float):
+    def next(self, dT: float, sigma_process=0.0):
         if self.method == "rk":
             k1 = self.rk_fun(self.state, self.now_time)
             k2 = self.rk_fun(self.state + 0.5 * dT * k1, self.now_time + 0.5 * dT)
             k3 = self.rk_fun(self.state + 0.5 * dT * k2, self.now_time + 0.5 * dT)
             k4 = self.rk_fun(self.state + dT * k3, self.now_time + dT)
-            self.state = self.state + dT / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+            self.state = (self.state + dT / 6 * (k1 + 2 * k2 + 2 * k3 + k4) +
+                          np.array([np.random.normal(0, sigma_process) for _ in range(self.var_num)]))
         else:
             for idx_var in range(self.var_num):
                 last_d = self.eq_list[idx_var](self.state)

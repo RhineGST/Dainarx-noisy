@@ -20,7 +20,7 @@ from src.Evaluation import Evaluation
 from src.HybridAutomata import HybridAutomata
 
 
-def run(data_list, input_data, config, evaluation: Evaluation):
+def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     input_data = np.array(input_data)
     get_feature = FeatureExtractor(len(data_list[0]), len(input_data[0]),
                                    order=config['order'], dt=config['dt'], minus=config['minus'],
@@ -28,11 +28,13 @@ def run(data_list, input_data, config, evaluation: Evaluation):
     Slice.clear()
     slice_data = []
     chp_list = []
-    for data, input_val in zip(data_list, input_data):
-        change_points = find_change_point(data, input_val, get_feature, w=config['window_size'])
-        chp_list.append(change_points)
-        print("ChP:\t", change_points)
-        slice_curve(slice_data, data, input_val, change_points, get_feature)
+    for data, input_val, chp in zip(data_list, input_data, gt_point):
+        change_points, err_list = find_change_point(data, input_val, get_feature, w=config['window_size'])
+        plt.plot(np.arange(len(err_list)), err_list)
+        plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        plt.show()
+        # print("ChP:\t", np.array(change_points))
+        slice_curve(slice_data, data, input_val, chp, get_feature)
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
     Slice.Method = config['clustering_method']
@@ -52,7 +54,8 @@ def get_config(json_path, evaluation: Evaluation):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(json_path):
         json_path = os.path.join(current_dir, json_path)
-    default_config = {'dt': 0.01, 'total_time': 10, 'order': 3, 'window_size': 10, 'clustering_method': 'fit',
+    default_config = {'dt': 0.01, 'total_time': 10, 'sigma_measure': 0.0, 'sigma_process': 0.0,
+                      'order': 3, 'window_size': 10, 'clustering_method': 'fit',
                       'minus': False, 'need_bias': True, 'other_items': '', 'kernel': 'linear', 'svm_c': 1e6,
                       'class_weight': 1.0, 'need_reset': False, 'self_loop': False}
     config = {}
@@ -117,7 +120,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     evaluation.submit(gt_chp=gt_list[test_num:])
     evaluation.submit(train_mode_list=mode_list[test_num:])
     evaluation.start()
-    sys, slice_data = run(data[test_num:], input_list[test_num:], config, evaluation)
+    sys, slice_data = run(data[test_num:], input_list[test_num:], config, evaluation, gt_list[test_num:])
     print(f"mode number: {len(sys.mode_list)}")
     print("Start simulation")
     all_fit_mode, all_gt_mode = get_mode_list(slice_data, mode_list[test_num:])
@@ -126,7 +129,6 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     data_test = data[:test_num]
     mode_list_test = mode_list[:test_num]
     input_list_test = input_list[:test_num]
-
     init_state_test = get_init_state(data_test, mode_map, mode_list_test, config['order'])
     fit_data_list, mode_data_list = [], []
     draw_index = 0  # If it is None, draw all the test data
@@ -159,7 +161,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/non_linear/duffing.json")
+    eval_log = main("./automata/FaMoS/variable_heating_system.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

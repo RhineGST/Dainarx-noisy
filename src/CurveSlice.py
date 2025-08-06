@@ -65,7 +65,7 @@ class Slice:
     def check_valid(self):
         if self.valid and self.err > Slice.FitErrorThreshold:
             warnings.warn("Find a invalid segmentation!")
-            self.valid = False
+            self.valid = True # False
 
     def __init__(self, data, input_data, get_feature, isFront, length):
         self.data = data
@@ -89,6 +89,7 @@ class Slice:
 
     def test_set(self, other_list):
         data, input_data, other_fit_order = [], [], None
+        max_err = self.err
         for s in other_list:
             data.append(s.data)
             input_data.append(s.input_data)
@@ -96,12 +97,14 @@ class Slice:
                 other_fit_order = copy.copy(s.fit_order)
             else:
                 other_fit_order = min(other_fit_order, s.fit_order)
+            max_err = max(max_err, s.err)
 
         _, err, fit_order = self.get_feature([self.data] + data, [self.input_data] + input_data, is_list=True)
         order_condition = True
         for i in range(len(fit_order)):
             order_condition = order_condition and fit_order[i] <= max(self.fit_order[i], other_fit_order[i])
-        return order_condition and max(err) < Slice.FitErrorThreshold
+        # return order_condition and max(err) < Slice.FitErrorThreshold
+        return max(err) < max_err * 1.5
 
     def __and__(self, other):
         if Slice.Method == 'dis':
@@ -119,7 +122,7 @@ class Slice:
             order_condition = True
             for i in range(len(fit_order)):
                 order_condition = order_condition and fit_order[i] <= max(self.fit_order[i], other.fit_order[i])
-            return order_condition and max(err) < Slice.FitErrorThreshold
+            return order_condition and max(err) < max(self.err, other.err) * 1.5# Slice.FitErrorThreshold
 
 
 def slice_curve(cut_data, data, input_data, change_points, get_feature):

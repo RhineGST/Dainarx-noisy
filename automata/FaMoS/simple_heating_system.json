@@ -37,14 +37,16 @@
     {"mode": 1, "x1": [22.0]},
     {"mode": 1, "x1": [23.0]},
     {"mode": 2, "x1": [22.0]},
-    {"mode": 2, "x1": [24.0]},
+    {"mode": 2, "x1": [21.0]},
     {"mode": 2, "x1": [22.5]},
     {"mode": 2, "x1": [23.0]}
 ],
 
   "config": {
-    "dt": 0.01,
+    "dt": 0.02,
     "total_time": 21.0,
+    "sigma_measure": 0.05,
+    "sigma_process": 0.05,
     "order": 1,
     "class_weight": 0.1
   }
