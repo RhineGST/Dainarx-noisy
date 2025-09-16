@@ -32,7 +32,20 @@ class Slice:
     def fit_threshold_one(get_feature, data1, data2):
         feature1 = data1.feature
         feature2 = data2.feature
-        assert len(feature1) == len(feature2)
+
+        # 直接跳过特征为空的数据
+        if feature1 is None or feature2 is None or len(feature1) == 0 or len(feature2) == 0:
+            print(f"[Warning] Skip empty feature: "
+                f"len(feature1)={0 if feature1 is None else len(feature1)}, "
+                f"len(feature2)={0 if feature2 is None else len(feature2)}")
+            return  # 跳过当前 pair
+
+        if len(feature1) != len(feature2):
+            print(f"[Warning] Skip inconsistent feature length: "
+                f"len(feature1)={len(feature1)}, len(feature2)={len(feature2)}")
+            return
+        
+        # assert len(feature1) == len(feature2)
         _, err, fit_order = get_feature([data1.data, data2.data],
                                       [data1.input_data, data2.input_data], is_list=True)
         if fit_order <= max(data1.fit_order, data2.fit_order):

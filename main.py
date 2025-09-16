@@ -30,15 +30,23 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     chp_list = []
     for data, input_val, chp in zip(data_list, input_data, gt_point):
         change_points, err_list = find_change_point(data, input_val, get_feature, w=config['window_size'])
-        plt.plot(np.arange(len(err_list)), err_list)
-        plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
-        plt.show()
-        # print("ChP:\t", np.array(change_points))
+        # plt.plot(np.arange(len(err_list)), err_list)
+        # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        # plt.show()
+        # # print("ChP:\t", np.array(change_points))
         slice_curve(slice_data, data, input_val, chp, get_feature)
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
     Slice.Method = config['clustering_method']
     Slice.fit_threshold(slice_data)
+    #跳过特征为空的无效的分割
+    slice_data = [
+        d for d in slice_data
+        if d.feature is not None
+        and len(d.feature) > 0
+        and d.fit_order is not None
+        and len(d.fit_order) == len(d.feature)
+    ]
     clustering(slice_data, config['self_loop'])
     evaluation.recording_time("clustering")
     adj = guard_learning(slice_data, get_feature, config)
@@ -77,7 +85,7 @@ def get_config(json_path, evaluation: Evaluation):
     return config, get_hash_code(json_file, config)
 
 
-def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
+def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
     evaluation = Evaluation(json_path)
     config, hash_code = get_config(json_path, evaluation)
     HybridAutomata.LoopWarning = not config['self_loop']
@@ -96,6 +104,8 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     data = []
     input_list = []
     gt_list = []
+    clean_data = []  # 新增：存储clean data
+    clean_mode_list = []  # 新增：存储clean mode data
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(data_path):
@@ -113,6 +123,18 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
             data.append(state_data_temp)
             mode_list.append(mode_data_temp)
             input_list.append(npz_file['input'])
+            
+            # 新增：加载clean data
+            clean_file_name = file.replace("test_data", "clean_data")
+            if os.path.exists(os.path.join(root, clean_file_name)):
+                clean_npz_file = np.load(os.path.join(root, clean_file_name))
+                clean_data.append(clean_npz_file['state'])
+                clean_mode_list.append(clean_npz_file['mode'])
+            else:
+                # 如果没有clean data文件，使用原始数据（但会有警告）
+                print(f"Warning: Clean data file {clean_file_name} not found, using original data")
+                clean_data.append(state_data_temp)
+                clean_mode_list.append(mode_data_temp)
 
     test_num = 6
 
@@ -129,39 +151,77 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     data_test = data[:test_num]
     mode_list_test = mode_list[:test_num]
     input_list_test = input_list[:test_num]
+    clean_data_test = clean_data[:test_num]  # 新增：测试集的clean data
+    clean_mode_list_test = clean_mode_list[:test_num]  # 新增：测试集的clean mode data
     init_state_test = get_init_state(data_test, mode_map, mode_list_test, config['order'])
     fit_data_list, mode_data_list = [], []
     draw_index = 0  # If it is None, draw all the test data
-    for data, mode_list, input_list, init_state in zip(data_test, mode_list_test, input_list_test, init_state_test):
-        fit_data = [data[:, i] for i in range(config['order'])]
-        mode_data = list(mode_list[:config['order']])
-        sys.reset(init_state, input_list[:, :config['order']])
-        for i in range(config['order'], data.shape[1]):
-            state, mode, switched = sys.next(input_list[:, i])
+    for data_item, mode_item, input_item, init_state, clean_data_item, clean_mode_item in zip(
+        data_test, mode_list_test, input_list_test, init_state_test, clean_data_test, clean_mode_list_test):
+        
+        fit_data = [data_item[:, i] for i in range(config['order'])]
+        mode_data = list(mode_item[:config['order']])
+        sys.reset(init_state, input_item[:, :config['order']])
+        for i in range(config['order'], data_item.shape[1]):
+            state, mode, switched = sys.next(input_item[:, i])
             fit_data.append(state)
             mode_data.append(mode_map_inv.get(mode, -mode))
         fit_data = np.array(fit_data)
         evaluation.submit(mode_num=len(sys.mode_list))
         fit_data_list.append(np.transpose(fit_data))
         mode_data_list.append(mode_data)
+        
         if need_plot and (draw_index == 0 or draw_index is None):
             need_plot = not need_plot
-            for var_idx in range(data.shape[0]):
-                plt.plot(np.arange(len(data[var_idx])), data[var_idx], color='c')
-                plt.plot(np.arange(fit_data.shape[0]), fit_data[:, var_idx], color='r')
+            
+            for var_idx in range(data_item.shape[0]):
+                plt.figure(figsize=(12, 6))
+                
+                plt.plot(np.arange(len(data_item[var_idx])), data_item[var_idx], 
+                        color='c', label='Noisy Data', alpha=0.7, linewidth=1)
+                
+                plt.plot(np.arange(len(clean_data_item[var_idx])), clean_data_item[var_idx], 
+                        color='y', label='Clean Data', alpha=0.9, linewidth=2, linestyle='--')
+
+                plt.plot(np.arange(fit_data.shape[0]), fit_data[:, var_idx], 
+                        color='r', label='Fitted Data', alpha=0.8, linewidth=2)
+                
+                plt.title(f'Variable {var_idx + 1} Comparison')
+                plt.xlabel('Time Step')
+                plt.ylabel('Value')
+                plt.legend()
+                plt.grid(True, alpha=0.3)
                 plt.show()
-            plt.plot(np.arange(len(mode_list)), mode_list, color='c')
-            plt.plot(np.arange(len(mode_data)), mode_data, color='r')
+            
+            plt.figure(figsize=(12, 6))
+            
+            plt.plot(np.arange(len(mode_item)), mode_item, 
+                    color='c', label='Noisy Mode', alpha=0.7, linewidth=1, marker='o', markersize=3)
+            
+            plt.plot(np.arange(len(clean_mode_item)), clean_mode_item, 
+                    color='y', label='Clean Mode', alpha=0.9, linewidth=2, linestyle='--', marker='s', markersize=4)
+            
+            plt.plot(np.arange(len(mode_data)), mode_data, 
+                    color='r', label='Fitted Mode', alpha=0.8, linewidth=2, marker='^', markersize=4)
+            
+            plt.title('Mode Comparison')
+            plt.xlabel('Time Step')
+            plt.ylabel('Mode')
+            plt.legend()
+            plt.grid(True, alpha=0.3)
+            plt.yticks(sorted(set(list(mode_item) + list(clean_mode_item) + list(mode_data))))
             plt.show()
+            
         if draw_index is not None:
             draw_index -= 1
+            
     evaluation.submit(fit_mode=mode_data_list, fit_data=np.array(fit_data_list),
                       gt_mode=mode_list_test, gt_data=data_test, dt=config['dt'])
     return evaluation.calc()
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/FaMoS/variable_heating_system.json")
+    eval_log = main("./automata/FaMoS/multi_room_heating.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

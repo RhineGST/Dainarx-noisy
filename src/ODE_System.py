@@ -78,7 +78,8 @@ class ODESystem:
         self.input_fun_list = self.analyticalInput()
         self.now_time = 0.
         self.reset_val = {}
-        np.random.seed(time.time_ns() % (2**32))
+        # np.random.seed(seed := time.time_ns() % (2**32))
+        # print(f"Random seed set to: {seed}")
 
     def fit_state_size(self):
         state = np.zeros((self.var_num, self.max_order)).astype(np.float64)
