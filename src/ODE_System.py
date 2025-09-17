@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from math import *
 import time
 
-
 class ODESystem:
     @staticmethod
     def analyticalExpression(expr_list: str, var_list: list[str], input_list: list[str] = None):
@@ -78,8 +77,7 @@ class ODESystem:
         self.input_fun_list = self.analyticalInput()
         self.now_time = 0.
         self.reset_val = {}
-        # np.random.seed(seed := time.time_ns() % (2**32))
-        # print(f"Random seed set to: {seed}")
+        self.last_nosie = None
 
     def fit_state_size(self):
         state = np.zeros((self.var_num, self.max_order)).astype(np.float64)
@@ -94,14 +92,25 @@ class ODESystem:
             res[idx][self.order_list[idx] - 1] = self.eq_list[idx](y, *self.getInput(t))
         return res
 
+    def noisy_rk_fun(self, y, t, noise_vector):
+        res = np.roll(y, -1, axis=1)
+        for idx in range(self.var_num):
+            res[idx][self.order_list[idx] - 1] = self.eq_list[idx](y, *self.getInput(t)) + noise_vector[idx]
+        return res
+
     def next(self, dT: float, sigma_process=0.0):
         if self.method == "rk":
-            k1 = self.rk_fun(self.state, self.now_time)
-            k2 = self.rk_fun(self.state + 0.5 * dT * k1, self.now_time + 0.5 * dT)
-            k3 = self.rk_fun(self.state + 0.5 * dT * k2, self.now_time + 0.5 * dT)
-            k4 = self.rk_fun(self.state + dT * k3, self.now_time + dT)
+            noise_vector1 = self.last_nosie if self.last_nosie is not None else \
+                [np.random.normal(0, sigma_process) for _ in range(self.var_num)]
+            noise_vector2 = [np.random.normal(0, sigma_process) for _ in range(self.var_num)]
+            noise_vector3 = [np.random.normal(0, sigma_process) for _ in range(self.var_num)]
+            k1 = self.noisy_rk_fun(self.state, self.now_time, noise_vector1)
+            k2 = self.noisy_rk_fun(self.state + 0.5 * dT * k1, self.now_time + 0.5 * dT, noise_vector2)
+            k3 = self.noisy_rk_fun(self.state + 0.5 * dT * k2, self.now_time + 0.5 * dT, noise_vector2)
+            k4 = self.noisy_rk_fun(self.state + dT * k3, self.now_time + dT, noise_vector3)
+            self.last_nosie = noise_vector3
             self.state = (self.state + dT / 6 * (k1 + 2 * k2 + 2 * k3 + k4))
-            self.state[:, 0] += np.array([np.random.normal(0, sigma_process) for _ in range(self.var_num)])
+            # self.state[:, 0] += np.array([np.random.normal(0, sigma_process) for _ in range(self.var_num)])
         else:
             for idx_var in range(self.var_num):
                 last_d = self.eq_list[idx_var](self.state)

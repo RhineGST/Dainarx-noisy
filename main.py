@@ -19,7 +19,6 @@ from src.BuildSystem import build_system, get_init_state
 from src.Evaluation import Evaluation
 from src.HybridAutomata import HybridAutomata
 
-
 def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     input_data = np.array(input_data)
     get_feature = FeatureExtractor(len(data_list[0]), len(input_data[0]),
@@ -33,7 +32,8 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
         # plt.plot(np.arange(len(err_list)), err_list)
         # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
         # plt.show()
-        # # print("ChP:\t", np.array(change_points))
+        print("ChP:\t", np.array(change_points))
+        chp_list.append(change_points)
         slice_curve(slice_data, data, input_val, chp, get_feature)
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
@@ -63,9 +63,10 @@ def get_config(json_path, evaluation: Evaluation):
     if not os.path.isabs(json_path):
         json_path = os.path.join(current_dir, json_path)
     default_config = {'dt': 0.01, 'total_time': 10, 'sigma_measure': 0.0, 'sigma_process': 0.0,
-                      'order': 3, 'window_size': 10, 'clustering_method': 'fit',
-                      'minus': False, 'need_bias': True, 'other_items': '', 'kernel': 'linear', 'svm_c': 1e6,
-                      'class_weight': 1.0, 'need_reset': False, 'self_loop': False}
+                      'random_seed': (time.time_ns() % (2**32)), 'order': 3, 'window_size': 10,
+                      'clustering_method': 'fit', 'minus': False, 'need_bias': True, 'other_items': '',
+                      'kernel': 'linear', 'svm_c': 1e6, 'class_weight': 1.0, 'need_reset': False,
+                      'self_loop': False}
     config = {}
     if json_path.isspace() or json_path == '':
         config = default_config
@@ -104,8 +105,8 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
     data = []
     input_list = []
     gt_list = []
-    clean_data = []  # 新增：存储clean data
-    clean_mode_list = []  # 新增：存储clean mode data
+    clean_data = []
+    clean_mode_list = []
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(data_path):
@@ -124,14 +125,12 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
             mode_list.append(mode_data_temp)
             input_list.append(npz_file['input'])
             
-            # 新增：加载clean data
             clean_file_name = file.replace("test_data", "clean_data")
             if os.path.exists(os.path.join(root, clean_file_name)):
                 clean_npz_file = np.load(os.path.join(root, clean_file_name))
                 clean_data.append(clean_npz_file['state'])
                 clean_mode_list.append(clean_npz_file['mode'])
             else:
-                # 如果没有clean data文件，使用原始数据（但会有警告）
                 print(f"Warning: Clean data file {clean_file_name} not found, using original data")
                 clean_data.append(state_data_temp)
                 clean_mode_list.append(mode_data_temp)
@@ -151,8 +150,8 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
     data_test = data[:test_num]
     mode_list_test = mode_list[:test_num]
     input_list_test = input_list[:test_num]
-    clean_data_test = clean_data[:test_num]  # 新增：测试集的clean data
-    clean_mode_list_test = clean_mode_list[:test_num]  # 新增：测试集的clean mode data
+    clean_data_test = clean_data[:test_num]
+    clean_mode_list_test = clean_mode_list[:test_num]
     init_state_test = get_init_state(data_test, mode_map, mode_list_test, config['order'])
     fit_data_list, mode_data_list = [], []
     draw_index = 0  # If it is None, draw all the test data
@@ -221,7 +220,7 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/FaMoS/multi_room_heating.json")
+    eval_log = main("./automata/ATVA/cell.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

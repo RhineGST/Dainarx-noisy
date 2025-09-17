@@ -16,8 +16,6 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
     :param dT: Discrete time.
     :param times: Total sampling time.
     """
-    np.random.seed(seed := time.time_ns() % (2**32))
-    print(f"Random seed set to: {seed}")
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(json_path):
         json_path = os.path.join(current_dir, json_path)
