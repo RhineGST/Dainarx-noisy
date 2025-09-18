@@ -27,14 +27,17 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     Slice.clear()
     slice_data = []
     chp_list = []
+    w = config['window_size']
     for data, input_val, chp in zip(data_list, input_data, gt_point):
-        change_points, err_list = find_change_point(data, input_val, get_feature, w=config['window_size'])
-        # plt.plot(np.arange(len(err_list)), err_list)
-        # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
-        # plt.show()
+        change_points, err_list = find_change_point(data, input_val, get_feature, w)
         print("ChP:\t", np.array(change_points))
+        plt.plot(np.arange(w, w + len(err_list)), err_list, linewidth=3)
+        plt.plot(np.arange(len(data[0])), 100*data[0], linewidth=3)
+        for cp in change_points:
+            plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
+        plt.show()
         chp_list.append(change_points)
-        slice_curve(slice_data, data, input_val, chp, get_feature)
+        slice_curve(slice_data, data, input_val, change_points, get_feature)
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
     Slice.Method = config['clustering_method']
@@ -86,10 +89,11 @@ def get_config(json_path, evaluation: Evaluation):
     return config, get_hash_code(json_file, config)
 
 
-def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
+def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     evaluation = Evaluation(json_path)
     config, hash_code = get_config(json_path, evaluation)
     HybridAutomata.LoopWarning = not config['self_loop']
+    np.random.seed(config['random_seed'])
     print('config: ')
     for key, value in config.items():
         print(f'\t{key}: {value}')
@@ -106,11 +110,16 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
     input_list = []
     gt_list = []
     clean_data = []
+    clean_input_list = []
+    clean_gt_list = []
     clean_mode_list = []
+    clean_data_path = "clean_data"
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(data_path):
         data_path = os.path.join(current_dir, data_path)
+    if not os.path.isabs(clean_data_path):
+        clean_data_path = os.path.join(current_dir, clean_data_path)
     for root, dirs, files in os.walk(data_path):
         print("Loading data!")
         for file in sorted(files, key=lambda x: int(re.search(r'(\d+)', x).group())):
@@ -124,16 +133,17 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
             data.append(state_data_temp)
             mode_list.append(mode_data_temp)
             input_list.append(npz_file['input'])
-            
-            clean_file_name = file.replace("test_data", "clean_data")
-            if os.path.exists(os.path.join(root, clean_file_name)):
-                clean_npz_file = np.load(os.path.join(root, clean_file_name))
-                clean_data.append(clean_npz_file['state'])
-                clean_mode_list.append(clean_npz_file['mode'])
-            else:
-                print(f"Warning: Clean data file {clean_file_name} not found, using original data")
-                clean_data.append(state_data_temp)
-                clean_mode_list.append(mode_data_temp)
+    for root, dirs, files in os.walk(clean_data_path):
+        for file in sorted(files, key=lambda x: int(re.search(r'(\d+)', x).group())):
+            if re.search(r"(.)*\.npz", file) is None:
+                continue
+            npz_file = np.load(os.path.join(root, file))
+            state_data_temp, mode_data_temp = npz_file['state'], npz_file['mode']
+            change_point_list = npz_file.get('change_points', get_ture_chp(mode_data_temp))
+            clean_gt_list.append(change_point_list)
+            clean_data.append(state_data_temp)
+            clean_mode_list.append(mode_data_temp)
+            clean_input_list.append(npz_file['input'])
 
     test_num = 6
 
@@ -220,7 +230,7 @@ def main(json_path: str, data_path='data', need_creat=True, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/ATVA/cell.json")
+    eval_log = main("./automata/ATVA/ball.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

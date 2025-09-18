@@ -16,11 +16,15 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
     :param dT: Discrete time.
     :param times: Total sampling time.
     """
+    clean_data_path = "clean_" + data_path
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(json_path):
         json_path = os.path.join(current_dir, json_path)
     if not os.path.isabs(data_path):
         data_path = os.path.join(current_dir, data_path)
+
+    if not os.path.isabs(clean_data_path):
+        clean_data_path = os.path.join(current_dir, clean_data_path)
 
     if not os.path.exists(data_path):
         os.mkdir(data_path)
@@ -28,6 +32,13 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
         files = os.listdir(data_path)
         for file in files:
             os.remove(os.path.join(data_path, file))
+
+    if not os.path.exists(clean_data_path):
+        os.mkdir(clean_data_path)
+    else:
+        files = os.listdir(clean_data_path)
+        for file in files:
+            os.remove(os.path.join(clean_data_path, file))
 
     with open(json_path, 'r') as f:
         data = json.load(f)
@@ -63,7 +74,7 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
                 
                 state, mode, switched = sys_noisy.next(dT, sigma_process)
                 state_data.append(np.array(state) +
-                                  np.array([random.normalvariate(0, sigma_measure) for _ in range(len(state))]))
+                                  np.array([np.random.normal(0, sigma_measure) for _ in range(len(state))]))
                 mode_data.append(mode)
                 input_data.append(sys_noisy.getInput())
                 if switched:
@@ -84,11 +95,10 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
             mode_data = np.array(mode_data)
             np.savez(os.path.join(data_path, "test_data" + str(state_id)),
                      state=state_data, mode=mode_data, input=input_data, change_points=change_points)
-            
             clean_state_data = np.transpose(np.array(clean_state_data))
             clean_input_data = np.transpose(np.array(clean_input_data))
             clean_mode_data = np.array(clean_mode_data)
-            np.savez(os.path.join(data_path, "clean_data" + str(state_id)),
+            np.savez(os.path.join(clean_data_path, "clean_data" + str(state_id)),
                      state=clean_state_data, mode=clean_mode_data, input=clean_input_data, change_points=clean_change_points)
             
             state_id += 1

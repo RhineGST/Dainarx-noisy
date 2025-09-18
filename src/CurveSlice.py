@@ -45,7 +45,7 @@ class Slice:
                 f"len(feature1)={len(feature1)}, len(feature2)={len(feature2)}")
             return
         
-        # assert len(feature1) == len(feature2)
+        assert len(feature1) == len(feature2)
         _, err, fit_order = get_feature([data1.data, data2.data],
                                       [data1.input_data, data2.input_data], is_list=True)
         if fit_order <= max(data1.fit_order, data2.fit_order):
@@ -81,8 +81,8 @@ class Slice:
             self.valid = True # False
 
     def __init__(self, data, input_data, get_feature, isFront, length):
-        self.data = data
-        self.input_data = input_data
+        self.data = data[:, 10:-10]
+        self.input_data = input_data[:, 10:-10]
         self.get_feature = get_feature
         self.valid = True
         if len(data[0]) > get_feature.order:

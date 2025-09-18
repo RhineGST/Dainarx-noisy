@@ -34,6 +34,7 @@ def get_hash_code(json_file, config):
         mark.pop('config')
     mark['dt'] = config['dt']
     mark['total_time'] = config['total_time']
+    mark['random_seed']= config['random_seed']
     return dict_hash(mark)
 
 

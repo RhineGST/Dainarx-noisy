@@ -14,7 +14,7 @@ def mergeChangePoints(data, th: float):
 
 
 def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10, merge_th=None, 
-                     rise_threshold: float = 0.3, min_rise_magnitude: float = 5.0):
+                     rise_threshold: float = 0.3, min_rise_magnitude: float = 2.0):
     r"""
     :param data: (N, M) Sample points for N variables.
     :param input_data: Input of system.
@@ -46,7 +46,6 @@ def find_change_point(data: np.array, input_data: np.array, get_feature, w: int 
         if len(prev_errors) >= 2:
             # recent_gradient = np.mean(np.diff(prev_errors[-2:]))
             
-            # 计算相对上升幅度（如果前一个点有效）
             if prev_errors[-1] > 1e-6:
                 rise_ratio = (current_error - prev_errors[-1]) / prev_errors[-1]
                 rise_magnitude = current_error - prev_errors[-1]
@@ -55,7 +54,7 @@ def find_change_point(data: np.array, input_data: np.array, get_feature, w: int 
                 if (
                     rise_ratio > rise_threshold and 
                     rise_magnitude > min_rise_magnitude and 
-                    rise_magnitude * rise_ratio > 5 and
+                    rise_magnitude * rise_ratio > 1.5 and
                     tail_len == 0):
                     
                     change_point_pos = pos + w - 1
