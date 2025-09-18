@@ -81,8 +81,8 @@ class Slice:
             self.valid = True # False
 
     def __init__(self, data, input_data, get_feature, isFront, length):
-        self.data = data[:, 10:-10]
-        self.input_data = input_data[:, 10:-10]
+        self.data = data[:, 3:-3]
+        self.input_data = input_data[:, 3:-3]
         self.get_feature = get_feature
         self.valid = True
         if len(data[0]) > get_feature.order:
