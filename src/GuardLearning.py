@@ -14,6 +14,7 @@ def guard_learning(data: list[Slice], get_feature, config):
         if not data[i].valid:
             continue
         mode = data[i].mode
+        data[i].undo_truncation()
         if negative_sample.get(mode) is None:
             negative_sample[mode] = []
         negative_sample[mode].append(np.transpose(data[i].data[:, :-1]))
@@ -41,4 +42,6 @@ def guard_learning(data: list[Slice], get_feature, config):
         sample = np.concatenate((negative_sample[u], positive_sample[(u, v)]))
         svc.fit(sample, label)
         adj[(u, v)] = (svc, slice_data[(u, v)])
+    for i in range(len(data)):
+        data[i].truncation()
     return adj

@@ -80,9 +80,19 @@ class Slice:
             warnings.warn("Find a invalid segmentation!")
             self.valid = True # False
 
+    def undo_truncation(self):
+        (self.data, self.input_data) = self.ori_data
+
+    def truncation(self):
+        self.undo_truncation()
+        self.data = self.data[:, self.truncation_size:-self.truncation_size]
+        self.input_data = self.input_data[:, self.truncation_size:-self.truncation_size]
+
     def __init__(self, data, input_data, get_feature, isFront, length):
-        self.data = data[:, 10:-10]
-        self.input_data = input_data[:, 10:-10]
+        self.truncation_size = 3
+        self.ori_data = (data, input_data)
+        self.data = data[:, self.truncation_size:-self.truncation_size]
+        self.input_data = input_data[:, self.truncation_size:-self.truncation_size]
         self.get_feature = get_feature
         self.valid = True
         if len(data[0]) > get_feature.order:
