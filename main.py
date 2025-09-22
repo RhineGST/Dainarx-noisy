@@ -19,6 +19,10 @@ from src.BuildSystem import build_system, get_init_state
 from src.Evaluation import Evaluation
 from src.HybridAutomata import HybridAutomata
 
+def resample(data_list, input_list, weight):
+    return data_list[:, ::weight], input_list[:, ::weight]
+
+
 def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     input_data = np.array(input_data)
     get_feature = FeatureExtractor(len(data_list[0]), len(input_data[0]),
@@ -29,15 +33,17 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     chp_list = []
     w = config['window_size']
     for data, input_val, chp in zip(data_list, input_data, gt_point):
-        change_points, err_list = find_change_point(data, input_val, get_feature, w)
-        print("ChP:\t", np.array(change_points))
-        plt.plot(np.arange(w, w + len(err_list)), err_list, linewidth=3)
-        plt.plot(np.arange(len(data[0])), 100*data[0], linewidth=3)
-        for cp in change_points:
-            plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
-        plt.show()
-        chp_list.append(change_points)
-        slice_curve(slice_data, data, input_val, change_points, get_feature)
+        sample_weight = 5
+        data_sam, input_sam = resample(data, input_val, sample_weight)
+        change_points, err_list = find_change_point(data_sam, input_sam, get_feature, w)
+        print("ChP:\t", np.array(change_points) * sample_weight)
+        # plt.plot(np.arange(w, w + len(err_list)) * sample_weight, err_list, linewidth=3)
+        # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        # for cp in change_points:
+        #     plt.axvline(x=cp * sample_weight, color='r', linestyle='--', linewidth=1.5)
+        # plt.show()
+        chp_list.append(np.array(change_points) * sample_weight)
+        slice_curve(slice_data, data, input_val, np.array(change_points) * sample_weight, get_feature)
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
     Slice.Method = config['clustering_method']
@@ -115,6 +121,9 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     clean_mode_list = []
     clean_data_path = "clean_data"
 
+    test_num = 6
+    gt_counter = test_num
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(data_path):
         data_path = os.path.join(current_dir, data_path)
@@ -129,6 +138,9 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
             state_data_temp, mode_data_temp = npz_file['state'], npz_file['mode']
             change_point_list = npz_file.get('change_points', get_ture_chp(mode_data_temp))
             gt_list.append(change_point_list)
+            if gt_counter == 0:
+                print()
+            gt_counter -= 1
             print("GT:\t", change_point_list.tolist())
             data.append(state_data_temp)
             mode_list.append(mode_data_temp)
@@ -145,7 +157,6 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
             clean_mode_list.append(mode_data_temp)
             clean_input_list.append(npz_file['input'])
 
-    test_num = 6
 
     print("Be running!")
     evaluation.submit(gt_chp=gt_list[test_num:])
@@ -230,7 +241,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/ATVA/ball.json")
+    eval_log = main("./automata/linear/two_tank.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

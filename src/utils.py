@@ -61,7 +61,7 @@ def max_bipartite_matching(fit_mode, gt_mode):
     edges = []
     for mode_a, mode_b in zip(fit_mode, gt_mode):
         if mode_b is not None and mode_b >= 0:
-            cnt[(mode_a, -mode_b)] = cnt.get((mode_a, mode_b), 0) + 1
+            cnt[(mode_a, -mode_b)] = cnt.get((mode_a, -mode_b), 0) + 1
 
     G = nx.Graph()
     l_nodes, r_nodes = [], []

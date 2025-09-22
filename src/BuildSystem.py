@@ -39,9 +39,10 @@ def build_system(data: list[Slice], res_adj: dict, get_feature):
 def get_init_state(data_list, mode_map, mode_list, bias):
     res = []
     for data, mode in zip(data_list, mode_list):
-        if mode_map.get(mode[bias - 1]) is None:
-            raise Exception("unknown mode: " + str(mode[bias - 1]))
-        init_state = {'mode': mode_map[mode[bias - 1]]}
+        # if mode_map.get(mode[bias - 1]) is None:
+        #     raise Exception("unknown mode: " + str(mode[bias - 1]))
+        # init_state = {'mode': mode_map[mode[bias - 1]]}
+        init_state = {'mode': mode[bias - 1]}
         for i in range(data.shape[0]):
             init_state['x' + str(i)] = data[i, (bias - 1)::-1]
         res.append(init_state)

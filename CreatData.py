@@ -44,8 +44,8 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
         data = json.load(f)
         sys = HybridAutomata.from_json(data['automaton'])
         config = data.get('config', {})
-        sigma_measure = config.get('sigma_measure', 0.02)
-        sigma_process = config.get('sigma_process', 0.02)
+        sigma_measure = config.get('sigma_measure', 0.01)
+        sigma_process = config.get('sigma_process', 0.01)
         state_id = 0
         cnt = 0
         for init_state in data['init_state']:

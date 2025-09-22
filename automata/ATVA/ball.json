@@ -38,7 +38,7 @@
   ],
   "config": {
     "dt": 0.01,
-    "total_time": 10.0,
+    "total_time": 5.0,
     "order": 1,
     "need_reset": true,
     "other_items": "x_[?]",

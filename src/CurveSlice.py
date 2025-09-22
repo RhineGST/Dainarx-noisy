@@ -89,14 +89,14 @@ class Slice:
         self.input_data = self.input_data[:, self.truncation_size:-self.truncation_size]
 
     def __init__(self, data, input_data, get_feature, isFront, length):
-        self.truncation_size = 3
+        self.truncation_size = 6
         self.ori_data = (data, input_data)
         self.data = data[:, self.truncation_size:-self.truncation_size]
         self.input_data = input_data[:, self.truncation_size:-self.truncation_size]
         self.get_feature = get_feature
         self.valid = True
-        if len(data[0]) > get_feature.order:
-            self.feature, err, self.fit_order = get_feature(data, input_data)
+        if len(self.data[0]) > get_feature.order:
+            self.feature, err, self.fit_order = get_feature(self.data, self.input_data)
             self.err = np.max(err)
         else:
             self.feature, self.err, self.fit_order = [], 1e6, []

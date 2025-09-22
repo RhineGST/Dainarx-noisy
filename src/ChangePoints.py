@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from src.DE import DE
 
@@ -12,47 +14,48 @@ def mergeChangePoints(data, th: float):
         last = pos
     return res
 
-# def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10, merge_th=None):
-#     r"""
-#     :param data: (N, M) Sample points for N variables.
-#     :param input_data: Input of system.
-#     :param get_feature: Feature extraction function.
-#     :param w: Slide window size, default is 10.
-#     :param merge_th: Change point merge threshold. The default value is w.
-#     :return: change_points, err_data: The change points, and the error in each position of N variables.
-#     """
-#     change_points = []
-#     error_datas = []
-#     tail_len = 0
-#     pos = 0
-#     last = None
-#     if merge_th is None:
-#         merge_th = w
+def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10, merge_th=None):
+    r"""
+    :param data: (N, M) Sample points for N variables.
+    :param input_data: Input of system.
+    :param get_feature: Feature extraction function.
+    :param w: Slide window size, default is 10.
+    :param merge_th: Change point merge threshold. The default value is w.
+    :return: change_points, err_data: The change points, and the error in each position of N variables.
+    """
+    change_points = []
+    error_datas = []
+    tail_len = 0
+    pos = 0
+    last = None
+    if merge_th is None:
+        merge_th = w
 
-#     eps = get_feature.get_eps(data)
-#     err_list = []
+    eps = get_feature.get_eps(data)
+    err_list = []
 
-#     while pos + w < data.shape[1]:
-#         feature, now_err, fit_order = get_feature(data[:, pos:(pos + w)], input_data[:, pos:(pos + w)])
-#         p_sw = np.max(now_err[0])
-#         err = (p_sw * 100000) / np.min(data[:, pos:(pos + w)][0])
-#         err_list.append(err)
+    while pos + w < data.shape[1]:
+        feature, now_err, fit_order = get_feature(data[:, pos:(pos + w)], input_data[:, pos:(pos + w)])
+        p_sw = np.max(now_err)
+        # err = math.log((p_sw * 10) / max(abs(np.min(data[:, pos:(pos + w)][0])), 1e-3))
+        err = p_sw
+        err_list.append(err)
         
-#         if last is not None:
-#             if (abs(err) > 400) and tail_len == 0:
-#                 change_points.append(pos + w - 1)
-#                 tail_len = w
-#             tail_len = max(tail_len - 1, 0)
-#         last = fit_order
-#         pos += 1
+        if last is not None:
+            if (abs(err) > 0.3) and tail_len == 0:
+                change_points.append(pos + w - 1)
+                tail_len = w
+            tail_len = max(tail_len - 1, 0)
+        last = fit_order
+        pos += 1
 
-#     res = mergeChangePoints(change_points, merge_th)
-#     res.append(data.shape[1])
-#     res.insert(0, 0)
+    res = mergeChangePoints(change_points, merge_th)
+    res.append(data.shape[1])
+    res.insert(0, 0)
 
-#     return res, err_list
+    return res, err_list
 
-def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10, merge_th=11, 
+def find_change_point_dhy(data: np.array, input_data: np.array, get_feature, w: int = 10, merge_th=11,
                      rise_threshold: float = 0.3, min_rise_magnitude: float = 0.1,
                      debug_points: list = None, enable_tail_check: bool = True):
     r"""
