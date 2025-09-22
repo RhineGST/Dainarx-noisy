@@ -14,7 +14,8 @@ def mergeChangePoints(data, th: float):
         last = pos
     return res
 
-def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10, merge_th=None):
+def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10,
+                      merge_th=None, change_th=0.1):
     r"""
     :param data: (N, M) Sample points for N variables.
     :param input_data: Input of system.
@@ -42,7 +43,7 @@ def find_change_point(data: np.array, input_data: np.array, get_feature, w: int 
         err_list.append(err)
         
         if last is not None:
-            if (abs(err) > 0.3) and tail_len == 0:
+            if (abs(err) > change_th) and tail_len == 0:
                 change_points.append(pos + w - 1)
                 tail_len = w
             tail_len = max(tail_len - 1, 0)

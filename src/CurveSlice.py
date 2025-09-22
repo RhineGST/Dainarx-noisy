@@ -88,8 +88,8 @@ class Slice:
         self.data = self.data[:, self.truncation_size:-self.truncation_size]
         self.input_data = self.input_data[:, self.truncation_size:-self.truncation_size]
 
-    def __init__(self, data, input_data, get_feature, isFront, length):
-        self.truncation_size = 6
+    def __init__(self, data, input_data, get_feature, isFront, length, truncation_size):
+        self.truncation_size = truncation_size
         self.ori_data = (data, input_data)
         self.data = data[:, self.truncation_size:-self.truncation_size]
         self.input_data = input_data[:, self.truncation_size:-self.truncation_size]
@@ -148,11 +148,12 @@ class Slice:
             return order_condition and max(err) < max(self.err, other.err) * 1.5# Slice.FitErrorThreshold
 
 
-def slice_curve(cut_data, data, input_data, change_points, get_feature):
+def slice_curve(cut_data, data, input_data, change_points, get_feature, truncation_size):
     last = 0
     for point in change_points:
         if point == 0:
             continue
-        cut_data.append(Slice(data[:, last:point], input_data[:, last:point], get_feature, last == 0, point - last))
+        cut_data.append(Slice(data[:, last:point], input_data[:, last:point],
+                              get_feature, last == 0, point - last, truncation_size))
         last = point
     return cut_data

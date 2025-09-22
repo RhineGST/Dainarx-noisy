@@ -33,17 +33,19 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     chp_list = []
     w = config['window_size']
     for data, input_val, chp in zip(data_list, input_data, gt_point):
-        sample_weight = 5
+        sample_weight = config['resampling_interval']
         data_sam, input_sam = resample(data, input_val, sample_weight)
-        change_points, err_list = find_change_point(data_sam, input_sam, get_feature, w)
-        print("ChP:\t", np.array(change_points) * sample_weight)
+        change_points, err_list = find_change_point(data_sam, input_sam, get_feature, w,
+                                                    change_th=config['change_th'])
+        change_points = np.array(change_points) * sample_weight
+        print("ChP:\t", change_points)
         # plt.plot(np.arange(w, w + len(err_list)) * sample_weight, err_list, linewidth=3)
         # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
         # for cp in change_points:
-        #     plt.axvline(x=cp * sample_weight, color='r', linestyle='--', linewidth=1.5)
+        #     plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
         # plt.show()
-        chp_list.append(np.array(change_points) * sample_weight)
-        slice_curve(slice_data, data, input_val, np.array(change_points) * sample_weight, get_feature)
+        chp_list.append(change_points)
+        slice_curve(slice_data, data, input_val, change_points, get_feature, config['truncation_size'])
     evaluation.submit(chp=chp_list)
     evaluation.recording_time("change_points")
     Slice.Method = config['clustering_method']
@@ -75,7 +77,8 @@ def get_config(json_path, evaluation: Evaluation):
                       'random_seed': (time.time_ns() % (2**32)), 'order': 3, 'window_size': 10,
                       'clustering_method': 'fit', 'minus': False, 'need_bias': True, 'other_items': '',
                       'kernel': 'linear', 'svm_c': 1e6, 'class_weight': 1.0, 'need_reset': False,
-                      'self_loop': False}
+                      'self_loop': False, "resampling_interval": 1, "truncation_size": 5,
+                      "change_th": 0.1}
     config = {}
     if json_path.isspace() or json_path == '':
         config = default_config
