@@ -176,14 +176,15 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     input_list_test = input_list[:test_num]
     clean_data_test = clean_data[:test_num]
     clean_mode_list_test = clean_mode_list[:test_num]
-    init_state_test = get_init_state(data_test, mode_map, mode_list_test, config['order'])
+    clean_input_list_test = clean_input_list[:test_num]
+    init_state_test = get_init_state(clean_data_test, mode_map, mode_list_test, config['order'])
     fit_data_list, mode_data_list = [], []
     draw_index = 0  # If it is None, draw all the test data
     for data_item, mode_item, input_item, init_state, clean_data_item, clean_mode_item in zip(
-        data_test, mode_list_test, input_list_test, init_state_test, clean_data_test, clean_mode_list_test):
+        data_test, mode_list_test, clean_input_list_test, init_state_test, clean_data_test, clean_mode_list_test):
         
-        fit_data = [data_item[:, i] for i in range(config['order'])]
-        mode_data = list(mode_item[:config['order']])
+        fit_data = [clean_data_item[:, i] for i in range(config['order'])]
+        mode_data = list(clean_mode_item[:config['order']])
         sys.reset(init_state, input_item[:, :config['order']])
         for i in range(config['order'], data_item.shape[1]):
             state, mode, switched = sys.next(input_item[:, i])
