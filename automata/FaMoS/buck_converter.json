@@ -60,6 +60,10 @@
     "order": 1,
     "other_items": "x_[?]",
     "kernel": "rbf",
-    "class_weight": 2
+    "class_weight": 2,
+    "resampling_interval": 4,
+    "truncation_size": 1,
+    "change_th": 0.03,
+    "n_sample_ratio": 2.0
   }
 }

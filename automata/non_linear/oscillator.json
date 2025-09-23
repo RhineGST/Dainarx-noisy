@@ -46,6 +46,10 @@
     "total_time": 1,
     "order": 1,
     "other_items": "x_[?]; sin(x[?]); sin(x_[?])",
-    "kernel": "rbf"
+    "kernel": "rbf",
+    "resampling_interval": 6,
+    "truncation_size": 2,
+    "change_th": 0.03,
+    "n_sample_ratio": 2.0
   }
 }

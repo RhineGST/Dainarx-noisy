@@ -37,9 +37,21 @@ def guard_learning(data: list[Slice], get_feature, config):
 
     adj = {}
     for (u, v), sample in positive_sample.items():
+        n_negative = negative_sample[u].shape[0]
+        n_positive = len(sample)
+        
+        # 设置采样比例
+        sample_ratio = config.get('n_sample_ratio')
+        n_negative_to_sample = min(n_negative, int(n_positive * sample_ratio))
+        
+        if n_negative_to_sample < n_negative:
+            indices = np.random.choice(n_negative, n_negative_to_sample, replace=False)
+            negative_selected = negative_sample[u][indices]
+        else:
+            negative_selected = negative_sample[u]
         svc = SVC(C=config['svm_c'], kernel=config['kernel'], class_weight={0: config['class_weight'], 1: 1})
-        label = np.concatenate((np.zeros(negative_sample[u].shape[0]), np.ones(len(positive_sample[(u, v)]))))
-        sample = np.concatenate((negative_sample[u], positive_sample[(u, v)]))
+        label = np.concatenate((np.zeros(negative_selected.shape[0]), np.ones(len(positive_sample[(u, v)]))))
+        sample = np.concatenate((negative_selected, positive_sample[(u, v)]))
         svc.fit(sample, label)
         adj[(u, v)] = (svc, slice_data[(u, v)])
     for i in range(len(data)):

@@ -45,6 +45,10 @@
     "total_time": 10.0,
     "order": 1,
     "need_bias": true,
-    "other_items": "x[?] * x[?]"
+    "other_items": "x[?] * x[?]",
+    "resampling_interval": 12,
+    "truncation_size": 2,
+    "change_th": 0.1,
+    "n_sample_ratio": 3.0
   }
 }

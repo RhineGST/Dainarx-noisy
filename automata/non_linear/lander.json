@@ -46,6 +46,10 @@
     "total_time": 10,
     "order": 1,
     "minus": true,
-    "other_items": "x_[?]; x1 : x3[?] / x2[?];"
+    "other_items": "x_[?]; x1 : x3[?] / x2[?];",
+    "resampling_interval": 2,
+    "truncation_size": 1,
+    "change_th": 0.03,
+    "n_sample_ratio": 3.0
   }
 }
