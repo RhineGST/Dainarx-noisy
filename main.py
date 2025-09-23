@@ -78,7 +78,7 @@ def get_config(json_path, evaluation: Evaluation):
                       'clustering_method': 'fit', 'minus': False, 'need_bias': True, 'other_items': '',
                       'kernel': 'linear', 'svm_c': 1e6, 'class_weight': 1.0, 'need_reset': False,
                       'self_loop': False, "resampling_interval": 1, "truncation_size": 5,
-                      "change_th": 0.1, "'n_sample_ratio": 1.0}
+                      "change_th": 0.1, "n_sample_ratio": 1.0}
     config = {}
     if json_path.isspace() or json_path == '':
         config = default_config
@@ -244,7 +244,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/linear/two_tank.json")
+    eval_log = main("./automata/ATVA/ball.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")
