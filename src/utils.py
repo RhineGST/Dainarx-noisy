@@ -35,6 +35,8 @@ def get_hash_code(json_file, config):
     mark['dt'] = config['dt']
     mark['total_time'] = config['total_time']
     mark['random_seed']= config['random_seed']
+    mark['sigma_process'] = config['sigma_process']
+    mark['sigma_measure'] = config['sigma_measure']
     return dict_hash(mark)
 
 

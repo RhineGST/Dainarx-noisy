@@ -98,12 +98,12 @@ class ODESystem:
             res[idx][self.order_list[idx] - 1] = self.eq_list[idx](y, *self.getInput(t)) + noise_vector[idx]
         return res
 
-    def next(self, dT: float, sigma_process=0.0):
+    def next(self, dT: float, sigma_process=0.0, rng=None):
         if self.method == "rk":
             noise_vector1 = self.last_nosie if self.last_nosie is not None else \
-                [np.random.normal(0, sigma_process) for _ in range(self.var_num)]
-            noise_vector2 = [np.random.normal(0, sigma_process) for _ in range(self.var_num)]
-            noise_vector3 = [np.random.normal(0, sigma_process) for _ in range(self.var_num)]
+                [rng.normal(0, sigma_process) for _ in range(self.var_num)]
+            noise_vector2 = [rng.normal(0, sigma_process) for _ in range(self.var_num)]
+            noise_vector3 = [rng.normal(0, sigma_process) for _ in range(self.var_num)]
             k1 = self.noisy_rk_fun(self.state, self.now_time, noise_vector1)
             k2 = self.noisy_rk_fun(self.state + 0.5 * dT * k1, self.now_time + 0.5 * dT, noise_vector2)
             k3 = self.noisy_rk_fun(self.state + 0.5 * dT * k2, self.now_time + 0.5 * dT, noise_vector2)

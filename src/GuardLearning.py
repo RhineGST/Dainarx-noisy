@@ -5,7 +5,7 @@ from src.CurveSlice import Slice
 from src.Reset import ResetFun
 
 
-def guard_learning(data: list[Slice], get_feature, config):
+def guard_learning(data: list[Slice], get_feature, config, rng):
     positive_sample = {}
     negative_sample = {}
     slice_data = {}
@@ -45,7 +45,7 @@ def guard_learning(data: list[Slice], get_feature, config):
         n_negative_to_sample = min(n_negative, int(n_positive * sample_ratio))
         
         if n_negative_to_sample < n_negative:
-            indices = np.random.choice(n_negative, n_negative_to_sample, replace=False)
+            indices = rng.choice(n_negative, n_negative_to_sample, replace=False)
             negative_selected = negative_sample[u][indices]
         else:
             negative_selected = negative_sample[u]

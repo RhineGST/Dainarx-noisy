@@ -23,7 +23,7 @@ def resample(data_list, input_list, weight):
     return data_list[:, ::weight], input_list[:, ::weight]
 
 
-def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
+def run(data_list, input_data, config, evaluation: Evaluation, gt_point, rng):
     input_data = np.array(input_data)
     get_feature = FeatureExtractor(len(data_list[0]), len(input_data[0]),
                                    order=config['order'], dt=config['dt'], minus=config['minus'],
@@ -60,7 +60,7 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point):
     ]
     clustering(slice_data, config['self_loop'])
     evaluation.recording_time("clustering")
-    adj = guard_learning(slice_data, get_feature, config)
+    adj = guard_learning(slice_data, get_feature, config, rng)
     evaluation.recording_time("guard_learning")
     sys = build_system(slice_data, adj, get_feature)
     evaluation.stop("total")
@@ -102,7 +102,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     evaluation = Evaluation(json_path)
     config, hash_code = get_config(json_path, evaluation)
     HybridAutomata.LoopWarning = not config['self_loop']
-    np.random.seed(config['random_seed'])
+    random_generator = np.random.default_rng(config['random_seed'])
     print('config: ')
     for key, value in config.items():
         print(f'\t{key}: {value}')
@@ -111,8 +111,11 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
         need_creat = check_data_update(hash_code, data_path)
     if need_creat:
         print("Data being generated!")
-        creat_data(json_path, data_path, config['dt'], config['total_time'])
+        creat_data(json_path, data_path, config['dt'], config['total_time'], random_generator)
         save_hash_code(hash_code, data_path)
+
+    random_generator = np.random.default_rng(config['random_seed'])
+    random_generator = np.random.default_rng(random_generator.integers(2 ** 32))
 
     mode_list = []
     data = []
@@ -165,7 +168,8 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     evaluation.submit(gt_chp=gt_list[test_num:])
     evaluation.submit(train_mode_list=mode_list[test_num:])
     evaluation.start()
-    sys, slice_data = run(data[test_num:], input_list[test_num:], config, evaluation, gt_list[test_num:])
+    sys, slice_data = run(data[test_num:], input_list[test_num:], config,
+                          evaluation, gt_list[test_num:], random_generator)
     print(f"mode number: {len(sys.mode_list)}")
     print("Start simulation")
     all_fit_mode, all_gt_mode = get_mode_list(slice_data, mode_list[test_num:])
@@ -245,7 +249,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
 
 
 if __name__ == "__main__":
-    eval_log = main("./automata/ATVA/ball.json")
+    eval_log = main("./automata/ATVA/ball.json", need_creat=True)
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
         print(f"{key_}: {val_}")

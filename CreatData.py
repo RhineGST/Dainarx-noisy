@@ -9,8 +9,9 @@ import json
 import time
 
 
-def creat_data(json_path: str, data_path: str, dT: float, times: float):
+def creat_data(json_path: str, data_path: str, dT: float, times: float, random_generator):
     r"""
+    :param random_generator:
     :param json_path: File path of automata.
     :param data_path: Data storage path.
     :param dT: Discrete time.
@@ -72,15 +73,15 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
                 now += dT
                 idx += 1
                 
-                state, mode, switched = sys_noisy.next(dT, sigma_process)
+                state, mode, switched = sys_noisy.next(dT, sigma_process, random_generator)
                 state_data.append(np.array(state) +
-                                  np.array([np.random.normal(0, sigma_measure) for _ in range(len(state))]))
+                                  np.array([random_generator.normal(0, sigma_measure) for _ in range(len(state))]))
                 mode_data.append(mode)
                 input_data.append(sys_noisy.getInput())
                 if switched:
                     change_points.append(idx)
                 
-                clean_state, clean_mode, clean_switched = sys_clean.next(dT, 0)
+                clean_state, clean_mode, clean_switched = sys_clean.next(dT, 0, random_generator)
                 clean_state_data.append(np.array(clean_state))
                 clean_mode_data.append(clean_mode)
                 clean_input_data.append(sys_clean.getInput())
