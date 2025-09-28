@@ -5,6 +5,21 @@ from src.DE import DE
 from math import *
 
 
+def tls(A: np.ndarray, b: np.ndarray):
+    A = np.asarray(A, float)
+    b = np.asarray(b, float).reshape(-1, 1)
+    Z = np.hstack([A, b])
+
+    U, S, Vt = np.linalg.svd(Z, full_matrices=False)
+    v = Vt[-1, :]
+
+    if np.isclose(v[-1], 0.0):
+        x_ols, *_ = np.linalg.lstsq(A, b, rcond=None)
+        return x_ols.ravel()
+
+    x = -v[:-1] / v[-1]
+    return x.ravel()
+
 class FeatureExtractor:
     @staticmethod
     def unfoldItem(expr_list, idx, var_num):
@@ -121,6 +136,23 @@ class FeatureExtractor:
                 now_order += 1
         return res, err, max_order
 
+    def work_result(self, data, input_data, is_list: bool):
+        res = []
+        err = []
+        var_num = len(data) if not is_list else len(data[0])
+        matrix_list = [[] for _ in range(var_num)]
+        b_list = [[] for _ in range(var_num)]
+        if is_list:
+            for block, block_input in zip(data, input_data):
+                self.append_data(matrix_list, b_list, block, block_input)
+        else:
+            self.append_data(matrix_list, b_list, data, input_data)
+        for a, b in zip(matrix_list, b_list):
+            x = tls(a, b)
+            res.append(x)
+            err.append(max(np.abs((a @ x) - b)))
+        return res, err, [self.order for _ in range(self.var_num)]
+
     def work_normal(self, data, input_data, is_list: bool):
         res = []
         err = []
@@ -138,8 +170,10 @@ class FeatureExtractor:
             err.append(max(np.abs((a @ x) - b)))
         return res, err, [self.order for _ in range(self.var_num)]
 
-    def __call__(self, data, input_data, is_list=False):
-        if self.minus:
+    def __call__(self, data, input_data, is_list=False, is_result=False):
+        if is_result:
+            return self.work_result(data, input_data, is_list)
+        elif self.minus:
             return self.work_minus(data, input_data, is_list)
         else:
             return self.work_normal(data, input_data, is_list)

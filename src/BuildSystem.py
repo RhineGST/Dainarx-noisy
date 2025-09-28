@@ -26,7 +26,7 @@ def build_system(data: list[Slice], res_adj: dict, get_feature):
         data_of_mode[cur.mode][1].append(cur.input_data)
     mode_list = {}
     for (mode, cur_list) in data_of_mode.items():
-        feature_list = get_feature(cur_list[0], cur_list[1], is_list=True)[0]
+        feature_list = get_feature(cur_list[0], cur_list[1], is_list=True, is_result=True)[0]
         mode_list[mode] = DESystem(feature_list, [], [], get_feature)
     adj = {}
     for (u, v), (model, reset_fun) in res_adj.items():

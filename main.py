@@ -40,7 +40,9 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point, rng):
         change_points = np.array(change_points) * sample_weight
         print("ChP:\t", change_points)
         # plt.plot(np.arange(w, w + len(err_list)) * sample_weight, err_list, linewidth=3)
-        # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        # # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        # for cp in chp:
+        #     plt.axvline(x=cp, color='g', linestyle='--', linewidth=1.5)
         # for cp in change_points:
         #     plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
         # plt.show()
@@ -59,6 +61,7 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point, rng):
         and len(d.fit_order) == len(d.feature)
     ]
     clustering(slice_data, config['self_loop'])
+    clustering_checker = [(c.mode, c.isFront) for c in slice_data]
     evaluation.recording_time("clustering")
     adj = guard_learning(slice_data, get_feature, config, rng)
     evaluation.recording_time("guard_learning")
