@@ -37,7 +37,7 @@
     {"mode": 1, "x1": [1.32], "x2": [-1.8]}
   ],
   "config": {
-    "dt": 0.01,
+    "dt": 0.004,
     "total_time": 5.0,
     "order": 1,
     "need_reset": true,
@@ -46,9 +46,10 @@
     "resampling_interval": 1,
     "truncation_size": 1,
     "change_th": 0.5,
-    "n_sample_ratio": 2.0,
+    "n_sample_ratio": 60.0,
+    "svm_c": 1e5,
     "random_seed": 3184392152,
     "sigma_measure":0.05,
-    "sigma_process":0.1
+    "sigma_process":0.01
   }
 }
