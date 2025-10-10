@@ -9,14 +9,16 @@ class Slice:
     AbsoluteErrorThreshold = []
     ToleranceRatio = 0.1
     FitErrorThreshold = 1.
+    ClusteringThreshold = 1.5
     Method = 'fit'
 
     @staticmethod
-    def clear():
+    def clear(clustering_threshold=1.5):
         Slice.RelativeErrorThreshold = []
         Slice.AbsoluteErrorThreshold = []
         Slice.ToleranceRatio = 0.1
         Slice.FitErrorThreshold = 1.
+        Slice.ClusteringThreshold = clustering_threshold
         Slice.Method = 'fit'
 
     @staticmethod
@@ -127,7 +129,7 @@ class Slice:
         for i in range(len(fit_order)):
             order_condition = order_condition and fit_order[i] <= max(self.fit_order[i], other_fit_order[i])
         # return order_condition and max(err) < Slice.FitErrorThreshold
-        return max(err) < max_err * 1.5
+        return max(err) < max_err * Slice.ClusteringThreshold
 
     def __and__(self, other):
         if Slice.Method == 'dis':
