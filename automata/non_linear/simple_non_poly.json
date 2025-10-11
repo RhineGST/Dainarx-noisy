@@ -35,13 +35,8 @@
       {"mode": 2, "x": [4.9]},
 
       {"mode": 1, "x": [6.9]},
-      {"mode": 1, "x": [5.3]},
-      {"mode": 2, "x": [4.9]},
       {"mode": 1, "x": [7.5]},
-      {"mode": 2, "x": [4.7]},
       {"mode": 1, "x": [5]},
-      {"mode": 1, "x": [6]},
-      {"mode": 2, "x": [7]},
       {"mode": 2, "x": [8]}
   ],
   "config": {
@@ -50,6 +45,16 @@
     "order": 1,
     "need_reset": true,
     "other_items": "1 / x[?]",
-    "svm_c": 1e5
+    "svm_c": 1e5,
+    "resampling_interval": 20,
+    "window_size": 12,
+    "truncation_size": 50,
+    "change_th": 0.06,
+    "n_sample_ratio": 4.0,
+    "sigma_process": 0.1,
+    "sigma_measure": 0.01,
+    "fitting_method": "lstsq",
+    "clustering_th": 1.05,
+    "random_seed": 1751751280
   }
 }
