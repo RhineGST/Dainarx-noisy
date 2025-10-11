@@ -49,6 +49,10 @@
     "resampling_interval": 12,
     "truncation_size": 2,
     "change_th": 0.1,
-    "n_sample_ratio": 3.0
+    "n_sample_ratio": 3.0,
+    "svm_c":1e4,
+    "sigma_process":0.1,
+    "sigma_measure":0.01,
+    "random_seed": 212450080
   }
 }

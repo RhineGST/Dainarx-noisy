@@ -252,7 +252,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
             draw_index -= 1
             
     evaluation.submit(fit_mode=mode_data_list, fit_data=np.array(fit_data_list),
-                      gt_mode=mode_list_test, gt_data=data_test, dt=config['dt'])
+                      gt_mode=clean_mode_list_test, gt_data=clean_data_test, dt=config['dt'])
     return evaluation.calc()
 
 

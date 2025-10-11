@@ -50,6 +50,6 @@
     "svm_c": 1e5,
     "random_seed": 3184392152,
     "sigma_measure":0.05,
-    "sigma_process":0.01
+    "sigma_process":0.1
   }
 }
