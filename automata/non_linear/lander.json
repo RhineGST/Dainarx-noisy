@@ -48,8 +48,13 @@
     "minus": true,
     "other_items": "x_[?]; x1 : x3[?] / x2[?];",
     "resampling_interval": 2,
-    "truncation_size": 1,
-    "change_th": 0.03,
-    "n_sample_ratio": 3.0
+    "truncation_size": 3,
+    "change_th": 0.5,
+    "n_sample_ratio": 500.0,
+    "svm_c": 1e6,
+    "sigma_process": 0.1,
+    "sigma_measure": 0.02,
+    "fitting_method": "lstsq",
+    "random_seed": 1269522656
   }
 }

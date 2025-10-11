@@ -33,10 +33,8 @@
   ,
     {"mode": 1, "x1": [-0.815], "x2": [3.45]},
     {"mode": 1, "x1": [-0.876], "x2": [3.25]},
-    {"mode": 1, "x1": [-0.845], "x2": [3.38]},
     {"mode": 1, "x1": [-0.822], "x2": [3.05]},
     {"mode": 1, "x1": [-0.800], "x2": [3.50]},
-    {"mode": 1, "x1": [-0.850], "x2": [3.10]},
     {"mode": 1, "x1": [-0.880], "x2": [3.28]},
     {"mode": 1, "x1": [-0.835], "x2": [3.42]},
     {"mode": 1, "x1": [-0.868], "x2": [3.15]}
@@ -47,9 +45,15 @@
     "order": 1,
     "other_items": "x_[?]; sin(x[?]); sin(x_[?])",
     "kernel": "rbf",
-    "resampling_interval": 6,
+    "resampling_interval": 5,
     "truncation_size": 2,
-    "change_th": 0.03,
-    "n_sample_ratio": 2.0
+    "svm_c":1e3,
+    "n_sample_ratio":3,
+    "change_th": 0.026,
+    "window_size": 15,
+    "sigma_process": 0.1,
+    "sigma_measure": 0.005,
+    "fitting_method": "lstsq",
+    "random_seed": 3493675616
   }
 }

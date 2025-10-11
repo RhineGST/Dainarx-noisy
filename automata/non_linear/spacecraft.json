@@ -47,8 +47,10 @@
     "other_items": "x_[?]",
     "class_weight": 0.1,
     "n_sample_ratio": 3.0,
-    "sigma_process":0.1,
-    "sigma_measure":0.01,
-    "random_seed": 3133042064
+    "change_th": 0.28,
+    "sigma_process": 0.1,
+    "sigma_measure": 0.05,
+    "fitting_method": "lstsq",
+    "random_seed": 3938427968
   }
 }
