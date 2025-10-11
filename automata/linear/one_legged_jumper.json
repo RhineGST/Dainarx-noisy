@@ -49,11 +49,11 @@
     "window_size": 12,
     "truncation_size": 2,
     "change_th": 0.12,
-    "n_sample_ratio": 10.0,
-    "svm_c":1e5,
+    "n_sample_ratio": 12.0,
+    "svm_c":1e4,
     "kernel": "linear",
-    "sigma_process":0.08,
+    "sigma_process":0.1,
     "sigma_measure":0.02,
-    "random_seed": 1484899344
+    "random_seed": 936101864
   }
 }
