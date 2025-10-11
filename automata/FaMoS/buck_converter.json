@@ -67,7 +67,7 @@
     "n_sample_ratio": 10.0,
     "svm_c": 1e3,
     "sigma_measure":0.001,
-    "sigma_process":10.0,
-    "random_seed": 2958723968
+    "sigma_process":0.1,
+    "random_seed": 2092640536
   }
 }
