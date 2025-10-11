@@ -27,7 +27,8 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point, rng):
     input_data = np.array(input_data)
     get_feature = FeatureExtractor(len(data_list[0]), len(input_data[0]),
                                    order=config['order'], dt=config['dt'], minus=config['minus'],
-                                   need_bias=config['need_bias'], other_items=config['other_items'])
+                                   need_bias=config['need_bias'], other_items=config['other_items'],
+                                   fitting_method=config["fitting_method"])
     Slice.clear(config["clustering_th"])
     slice_data = []
     chp_list = []
@@ -86,7 +87,8 @@ def get_config(json_path, evaluation: Evaluation):
                       'clustering_method': 'fit', 'minus': False, 'need_bias': True, 'other_items': '',
                       'kernel': 'linear', 'svm_c': 1e6, 'class_weight': 1.0, 'need_reset': False,
                       'self_loop': False, "resampling_interval": 1, "truncation_size": 5,
-                      "clustering_th": 1.5, "change_th": 0.1, "n_sample_ratio": 1.0}
+                      "clustering_th": 1.5, "change_th": 0.1, "n_sample_ratio": 1.0,
+                      "fitting_method": "tls"}
     config = {}
     if json_path.isspace() or json_path == '':
         config = default_config

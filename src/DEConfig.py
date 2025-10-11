@@ -80,13 +80,15 @@ class FeatureExtractor:
         return res, res_order
 
     def __init__(self, var_num: int, input_num: int, order: int, dt: float,
-                 need_bias: bool = False, minus: bool = False, other_items: str = ''):
+                 need_bias: bool = False, minus: bool = False, other_items: str = '',
+                 fitting_method: str = 'tls'):
         self.var_num = var_num
         self.order = order
         self.dt = dt
         self.input_num = input_num
         self.minus = minus
         self.need_bias = need_bias
+        self.fitting_method = fitting_method
         self.fun_list, self.fun_order = FeatureExtractor.analyticalExpression(other_items, var_num, order)
 
     def get_eps(self, data):
@@ -148,7 +150,10 @@ class FeatureExtractor:
         else:
             self.append_data(matrix_list, b_list, data, input_data)
         for a, b in zip(matrix_list, b_list):
-            x = tls(a, b)
+            if self.fitting_method == 'tls':
+                x = tls(a, b)
+            else:
+                x = np.linalg.lstsq(a, b, rcond=None)[0]
             res.append(x)
             err.append(max(np.abs((a @ x) - b)))
         return res, err, [self.order for _ in range(self.var_num)]
