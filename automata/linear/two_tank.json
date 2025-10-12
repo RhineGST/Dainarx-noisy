@@ -46,11 +46,11 @@
     "resampling_interval": 3,
     "truncation_size": 2,
     "change_th": 0.14,
-    "n_sample_ratio": 2,
+    "n_sample_ratio": 100.0,
     "svm_c":1e6,
     "sigma_process":0.05,
     "sigma_measure":0.02,
     "clustering_th":1.2,
-    "random_seed": 1849009832
+    "random_seed": 3914441024
   }
 }

@@ -52,7 +52,7 @@
     "resampling_interval": 1,
     "truncation_size": 2,
     "change_th": 0.2,
-    "n_sample_ratio": 3.0,
-   "random_seed": 4260726008
+    "n_sample_ratio": 1.0,
+    "random_seed": 3676234112
   }
 }
