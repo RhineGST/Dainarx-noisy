@@ -48,8 +48,8 @@
     "change_th": 0.5,
     "n_sample_ratio": 60.0,
     "svm_c": 1e5,
-    "random_seed": 3184392152,
-    "sigma_measure":0.05,
-    "sigma_process":0.1
+    "sigma_measure":0.01,
+    "sigma_process":0.1,
+    "random_seed": 3720927408
   }
 }

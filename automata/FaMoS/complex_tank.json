@@ -159,6 +159,14 @@
     "order": 1,
     "window_size": 4,
     "class_weight": 0.1,
-    "svm_c": 1e3
+    "svm_c": 1e3,
+    "resampling_interval": 10,
+    "truncation_size": 20,
+    "change_th": 0.048,
+    "n_sample_ratio": 10.0,
+    "sigma_measure":0.01,
+    "sigma_process":0.01,
+    "clustering_th":1.2,
+    "random_seed": 2747326616
   }
 }

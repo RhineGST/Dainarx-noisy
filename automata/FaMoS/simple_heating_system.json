@@ -45,14 +45,14 @@
   "config": {
     "dt": 0.02,
     "total_time": 21.0,
-    "sigma_measure": 0.01,
-    "sigma_process": 0.1,
+    "sigma_measure": 0.05,
+    "sigma_process": 0.05,
     "order": 1,
     "class_weight": 0.1,
     "resampling_interval": 1,
     "truncation_size": 2,
-    "change_th": 0.2,
+    "change_th": 0.26,
     "n_sample_ratio": 1.0,
-    "random_seed": 3676234112
+    "random_seed": 1147832040
   }
 }
