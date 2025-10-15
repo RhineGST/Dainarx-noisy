@@ -88,7 +88,6 @@ class Slice:
     def truncation(self):
         self.undo_truncation()
         self.data = self.data[:, self.truncation_size:-self.truncation_size]
-        self.input_data = self.input_data[:, self.truncation_size:-self.truncation_size]
 
     def __init__(self, data, input_data, get_feature, isFront, length, truncation_size):
         self.truncation_size = truncation_size

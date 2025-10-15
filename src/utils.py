@@ -2,6 +2,7 @@ import numpy as np
 
 from src.CurveSlice import Slice
 import matplotlib.pyplot as plt
+import scipy.io as sio
 import networkx as nx
 import hashlib
 import os
@@ -26,6 +27,20 @@ def dict_hash(obj):
     for item in sorted_items:
         hash_obj.update(str(item).encode())
     return hash_obj.hexdigest()
+
+def mat2np(path):
+    mat_data = sio.loadmat(path)
+
+    mydata = mat_data['data']
+
+    data = []
+
+    for i in range(mydata.shape[0]):
+        struct = mydata[i, 0]
+        x = struct['x'][0][0]
+        data.append(np.array(x).T)
+
+    return data
 
 
 def get_hash_code(json_file, config):

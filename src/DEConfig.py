@@ -79,20 +79,16 @@ class FeatureExtractor:
                 res_order[idx].append(FeatureExtractor.findMaxorder(s) + 1)
         return res, res_order
 
-    def __init__(self, var_num: int, input_num: int, order: int, dt: float,
+    def __init__(self, var_num: int, input_num: int, order: int,
                  need_bias: bool = False, minus: bool = False, other_items: str = '',
                  fitting_method: str = 'tls'):
         self.var_num = var_num
         self.order = order
-        self.dt = dt
         self.input_num = input_num
         self.minus = minus
         self.need_bias = need_bias
         self.fitting_method = fitting_method
         self.fun_list, self.fun_order = FeatureExtractor.analyticalExpression(other_items, var_num, order)
-
-    def get_eps(self, data):
-        return 1e-6 * self.dt * np.max(data)
 
     def get_items(self, data, input_data, idx, max_order=None):
         res = []

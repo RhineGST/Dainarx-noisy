@@ -32,7 +32,6 @@ def find_change_point(data: np.array, input_data: np.array, get_feature, w: int 
     if merge_th is None:
         merge_th = w
 
-    eps = get_feature.get_eps(data)
     err_list = []
 
     while pos + w < data.shape[1]:
@@ -79,7 +78,6 @@ def find_change_point_dhy(data: np.array, input_data: np.array, get_feature, w: 
     if merge_th is None:
         merge_th = w
 
-    eps = get_feature.get_eps(data)
     err_list = []
     prev_errors = []
     
