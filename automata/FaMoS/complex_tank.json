@@ -167,6 +167,6 @@
     "sigma_measure":0.01,
     "sigma_process":0.01,
     "clustering_th":1.2,
-    "random_seed": 2747326616
+    "random_seed": 1957149392
   }
 }

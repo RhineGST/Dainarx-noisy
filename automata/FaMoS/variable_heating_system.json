@@ -53,16 +53,16 @@
     "dt": 0.05,
     "total_time": 20.0,
     "sigma_measure": 0.05,
-    "sigma_process": 0.1,
+    "sigma_process": 0.05,
     "order": 1,
     "class_weight": 0.1,
     "window_size": 8,
     "change_th":0.3,
     "resampling_interval": 1,
     "truncation_size": 2,
-    "n_sample_ratio": 10.0,
+    "n_sample_ratio": 16.0,
     "clustering_th":1.8,
     "svm_c": 1e5,
-    "random_seed": 1870124696
+    "random_seed": 2796130088
   }
 }
