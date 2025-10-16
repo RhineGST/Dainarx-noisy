@@ -15,7 +15,7 @@ def mergeChangePoints(data, th: float):
     return res
 
 def find_change_point(data: np.array, input_data: np.array, get_feature, w: int = 10,
-                      merge_th=None, change_th=0.1):
+                      merge_th=None, change_th=0.1, resample_interval=1):
     r"""
     :param data: (N, M) Sample points for N variables.
     :param input_data: Input of system.
@@ -29,13 +29,15 @@ def find_change_point(data: np.array, input_data: np.array, get_feature, w: int 
     tail_len = 0
     pos = 0
     last = None
+    w *= resample_interval
     if merge_th is None:
         merge_th = w
 
     err_list = []
 
     while pos + w < data.shape[1]:
-        feature, now_err, fit_order = get_feature(data[:, pos:(pos + w)], input_data[:, pos:(pos + w)])
+        feature, now_err, fit_order = get_feature(data[:, pos:(pos + w):resample_interval],
+                                                  input_data[:, pos:(pos + w):resample_interval])
         p_sw = np.max(now_err)
         # err = math.log((p_sw * 10) / max(abs(np.min(data[:, pos:(pos + w)][0])), 1e-3))
         err = p_sw

@@ -34,16 +34,15 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point, rng):
     w = config['window_size']
     for data, input_val in zip(data_list, input_data):
         sample_weight = config['resampling_interval']
-        data_sam, input_sam = resample(data, input_val, sample_weight)
-        change_points, err_list = find_change_point(data_sam, input_sam, get_feature, w,
-                                                    change_th=config['change_th'])
-        change_points = np.array(change_points) * sample_weight
+        change_points, err_list = find_change_point(data, input_val, get_feature, w,
+                                                    change_th=config['change_th'], resample_interval=sample_weight)
+        change_points = np.array(change_points)
         print("ChP:\t", change_points)
-        # plt.plot(np.arange(w, w + len(err_list)) * sample_weight, err_list, linewidth=3)
-        # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
-        # for cp in change_points:
-        #     plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
-        # plt.show()
+        plt.plot(np.arange(w * sample_weight, w * sample_weight + len(err_list)), err_list, linewidth=3)
+        plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        for cp in change_points:
+            plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
+        plt.show()
         chp_list.append(change_points)
         slice_curve(slice_data, data, input_val, change_points, get_feature, config['truncation_size'])
     evaluation.submit(chp=chp_list)
