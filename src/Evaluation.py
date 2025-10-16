@@ -1,6 +1,7 @@
 import numpy as np
 import bisect
 import time
+from tslearn.metrics import dtw, dtw_path
 from src.utils import get_ture_chp
 
 
@@ -35,14 +36,16 @@ class Evaluation:
         # fit_data = self.data['fit_data']
         # gt_mode = get_ture_chp(self.data['gt_mode'])
         # gt_data = self.data['gt_data']
+        mean_sum, diff = 0, 0
         for fit_mode, fit_data, gt_mode, gt_data in zip(self.data['fit_mode'], self.data['fit_data'],
                                                         self.data['gt_mode'], self.data['gt_data']):
             fit_mode = get_ture_chp(fit_mode)
             gt_mode = get_ture_chp(gt_mode)
-            diff = np.abs(fit_data - gt_data)
 
-            for var_idx in range(diff.shape[0]):
-                diff[var_idx] /= np.max(np.abs(gt_data[var_idx]))
+            for var_idx in range(fit_data.shape[0]):
+                max_gt = np.max(gt_data[var_idx])
+                diff += abs(dtw_l1(fit_data[var_idx] / max_gt, gt_data[var_idx] / max_gt))
+                mean_sum += len(fit_data[var_idx])
 
             res["tc"] = max(res["tc"], max_min_abs_diff(fit_mode, gt_mode) * dt, max_min_abs_diff(gt_mode, fit_mode) * dt)
 
@@ -51,12 +54,15 @@ class Evaluation:
                 train_tc = max(train_tc, max_min_abs_diff(chp, gt) * dt, max_min_abs_diff(gt, chp) * dt)
             res["train_tc"] = max(res["train_tc"], train_tc)
             res["max_diff"] = max(np.max(diff), res["max_diff"])
-            res["mean_diff"] = res['mean_diff'] + np.mean(diff)
-        res["mean_diff"] = res["mean_diff"] / len(self.data['fit_mode'])
+        res["mean_diff"] = diff / mean_sum
         res["clustering_error"] = abs(self.data['gt_mode_num'] - self.data['mode_num'])
         res["time"] = self.time_list.copy()
         return res
 
+
+def dtw_l1(x, y):
+    path, _ = dtw_path(x, y)
+    return np.sum([np.linalg.norm(x[i] - y[j]) for i, j in path])
 
 def max_min_abs_diff(a, b):
     sorted_b = sorted(b)
