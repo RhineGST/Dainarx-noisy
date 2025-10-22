@@ -28,10 +28,10 @@ def dict_hash(obj):
         hash_obj.update(str(item).encode())
     return hash_obj.hexdigest()
 
-def mat2np(path):
+def mat2np(path, name="data"):
     mat_data = sio.loadmat(path)
 
-    mydata = mat_data['data']
+    mydata = mat_data[name]
 
     data = []
 

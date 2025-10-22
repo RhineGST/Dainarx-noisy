@@ -38,11 +38,11 @@ def run(data_list, input_data, config, evaluation: Evaluation, gt_point, rng):
                                                     change_th=config['change_th'], resample_interval=sample_weight)
         change_points = np.array(change_points)
         print("ChP:\t", change_points)
-        plt.plot(np.arange(w * sample_weight, w * sample_weight + len(err_list)), err_list, linewidth=3)
-        plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
-        for cp in change_points:
-            plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
-        plt.show()
+        # plt.plot(np.arange(w * sample_weight, w * sample_weight + len(err_list)), err_list, linewidth=3)
+        # plt.plot(np.arange(len(data[0])), data[0], linewidth=3)
+        # for cp in change_points:
+        #     plt.axvline(x=cp, color='r', linestyle='--', linewidth=1.5)
+        # plt.show()
         chp_list.append(change_points)
         slice_curve(slice_data, data, input_val, change_points, get_feature, config['truncation_size'])
     evaluation.submit(chp=chp_list)
@@ -195,8 +195,15 @@ def main(json_path: str, need_plot=True):
     evaluation.submit(fit_mode=mode_data_list, fit_data=fit_data_list, gt_data=data_test)
     return evaluation.calc()
 
+from src.Evaluation import *
 
 if __name__ == "__main__":
+    fit_data = mat2np("./data.mat", "prediction")
+    gt_data = mat2np("./mat/FaMoS/measurementNoise/SimpleHeatingSystem.mat")
+    print(call_mean_diff(fit_data, gt_data[:6]))
+    exit()
+
+
     eval_log = main("./automata/ATVA/ball.json")
     print("Evaluation log:")
     for key_, val_ in eval_log.items():
