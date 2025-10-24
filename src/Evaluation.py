@@ -34,7 +34,8 @@ class Evaluation:
     def calc(self):
         res = {"name": self.name, 'max_diff': 0., 'mean_diff': 0.}
         diff, len_sum, cnt, cnt_pre = 0., 0., 0., 0.
-        for fit_data, gt_data in zip(self.data['fit_data'], self.data['gt_data']):
+        fit_data_list, gt_data_list = normalize_cur(self.data['fit_data'], self.data['gt_data'])
+        for fit_data, gt_data in zip(fit_data_list, gt_data_list):
             fit_data, gt_data = normalize_cur(fit_data, gt_data)
             diff += dtw_l1(fit_data, gt_data)
             cnt += gt_data.shape[1]
@@ -47,9 +48,9 @@ class Evaluation:
         return res
 
 def call_mean_diff(fit_data_list, gt_data_list):
+    fit_data_list, gt_data_list = normalize_cur(fit_data_list, gt_data_list)
     diff, len_sum, cnt, cnt_pre = 0., 0., 0., 0.
     for fit_data, gt_data in zip(fit_data_list, gt_data_list):
-        fit_data, gt_data = normalize_cur(fit_data, gt_data)
         # plt.plot(np.arange(len(fit_data[0])), fit_data[0])
         # plt.plot(np.arange(len(gt_data[0])), gt_data[0])
         # plt.show()
@@ -60,13 +61,15 @@ def call_mean_diff(fit_data_list, gt_data_list):
     return (diff / cnt_pre) / (len_sum / cnt)
 
 def normalize_cur(fit_data : np.array, gt_data : np.array):
-    max_val = np.max(gt_data, axis=1)
-    min_val = np.min(gt_data, axis=1)
+    max_val = np.max(np.max(gt_data, axis=2), axis=0)
+    min_val = np.min(np.min(gt_data, axis=2), axis=0)
     gap = max_val - min_val
-    for i in range(fit_data.shape[1]):
-        fit_data[:, i] = (fit_data[:, i] - min_val) / gap
-    for i in range(gt_data.shape[1]):
-        gt_data[:, i] = (gt_data[:, i] - min_val) / gap
+    for trace_idx in range(len(fit_data)):
+        for i in range(fit_data[trace_idx].shape[1]):
+            fit_data[trace_idx][:, i] = (fit_data[trace_idx][:, i] - min_val) / gap
+    for trace_idx in range(len(gt_data)):
+        for i in range(gt_data[trace_idx].shape[1]):
+            gt_data[trace_idx][:, i] = (gt_data[trace_idx][:, i] - min_val) / gap
     return fit_data, gt_data
 
 @njit(fastmath=True)
