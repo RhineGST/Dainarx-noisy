@@ -66,10 +66,9 @@
     "truncation_size": 5,
     "change_th": 0.05,
     "clustering_th": 1.4,
-    "n_sample_ratio": 10.0,
-    "svm_c": 1e3,
+    "n_sample_ratio": 1.0,
+    "svm_c": 1e5,
     "sigma_measure":0.01,
-    "sigma_process":0.01,
-    "random_seed": 2092640536
+    "random_seed": 1371372976
   }
 }

@@ -46,7 +46,6 @@
     "dt": 0.02,
     "total_time": 21.0,
     "sigma_measure": 0.05,
-    "sigma_process": 0.05,
     "order": 1,
     "class_weight": 0.1,
     "resampling_interval": 1,
