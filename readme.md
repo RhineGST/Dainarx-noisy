@@ -99,13 +99,13 @@ The system will generate evaluation_log.csv in the root directory, recording all
     "class_weight": 1.0,        // Weight of negative samples in SVM (positive sample = 1.0), default is 1.0.
     'sigma_measure': 0.0,       // Measure noise variance, default is 0.
     'sigma_process': 0.0,       // Process noise variance, default is 0.
-    'random_seed': 0,           // Random seed, generated randomly by default
+    'random_seed': 0,           // Random seed, generated randomly by default.
     "resampling_interval": 1,   // resampling stepsize d, default is 1.
     "truncation_size": 5,       // The size of the truncation after segmentation, default is 5.
     "clustering_th": 1.5,       // The fitting threshold of the clustering, default is 1.5.
     "change_th": 0.1,           // The fitting threshold of the segmentation, default is 0.1.
     "n_sample_ratio": 1.0,      // The same as "class_weight", it adopts a different implementation method.
-    "fitting_method": "tls"     // The fitting method used in the Mode Characterization ("tls" / "ls"), default is "tls"
+    "fitting_method": "tls"     // The fitting method used in the Mode Characterization ("tls" / "ls"), default is "tls".
     // Explanation of other_items:
     // Example: "x0, x2, x3: x[1] * x_[?]; x[?] * x1[2]"
     // Expressions are separated by semicolons (;).
